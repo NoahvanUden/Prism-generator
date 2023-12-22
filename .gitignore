@@ -29,5 +29,5 @@ bin/
 .DS_Store
 
 ### Models ###
-models/*.nm
-models/*.txt
+/models/*.nm
+/models/*.txt
