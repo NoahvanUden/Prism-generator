@@ -72,21 +72,24 @@ public class Model {
             normalize(Xpa[a]);
         }
 
-        Xu = new double[machines + 1];
-        lh = (1d - qD) * lambda;
-        for (int i = 0; i <= machines; i++) {
-            Xu[i] = poisson(lh, i);
-        }
-        normalize(Xu);
-
-        XpaXu = new double[machines + 1][machines + 1];
-        for (int a = 0; a <= machines; a++) {
-            for (int k = 0; k <= machines; k++) {
-                for (int i = 0; i <= k; i++) {
-                    XpaXu[a][k] += Xu[i] * Xpa[a][k-i];
-                }
+        if (qD == 1d) {
+            XpaXu = Xpa;
+        } else {
+            Xu = new double[machines + 1];
+            lh = (1d - qD) * lambda;
+            for (int i = 0; i <= machines; i++) {
+                Xu[i] = poisson(lh, i);
             }
-            normalize(XpaXu[a]);
+            normalize(Xu);
+            XpaXu = new double[machines + 1][machines + 1];
+            for (int a = 0; a <= machines; a++) {
+                for (int k = 0; k <= machines; k++) {
+                    for (int i = 0; i <= k; i++) {
+                        XpaXu[a][k] += Xu[i] * Xpa[a][k-i];
+                    }
+                }
+                normalize(XpaXu[a]);
+            }
         }
     }
 
