@@ -16,6 +16,8 @@ public class Model {
     double p;
     double qD;
 
+    int stockLimit;
+
     int ch;
     int cem;
 
@@ -30,6 +32,7 @@ public class Model {
 
     Model(int m, double p, double qD, int ch, int cem, double lambda) {
         this.machines = m;
+        this.stockLimit = m;
 
         this.p = p == 0d ? 0.01 : p;
         this.qD = qD;
@@ -164,6 +167,10 @@ public class Model {
         System.out.print("]\n");
     }
 
+    public void limitStock(int k) {
+        this.stockLimit = k;
+    }
+
     public void toFile(String filename) {
 
         int enum_counter = 0;
@@ -185,7 +192,7 @@ public class Model {
             file.write("module " + name + "\n\n");
 
 //            Declare variables
-            file.write("\ty: [-" + machines + ".." + machines + "] init 0;\n");
+            file.write("\ty: [-" + machines + ".." + stockLimit + "] init 0;\n");
             file.write("\ta: [0" + ".." + machines + "] init 0;\n");
             file.write("\ts: [" + states[0] + ".." + states[states.length-1] + "] init " + states[0] + ";\n");
             file.write("\n");
@@ -205,16 +212,16 @@ public class Model {
             file.write(";\n\n");
 
 //            SIGNAL_RECEIVED
-            for (int i = 0; i <= machines; i++) {
+            for (int i = 0; i <= stockLimit; i++) {
                 file.write("\t[] s=" + states[1] + " -> (y'=" + i + ")&(s'=" + states[2] + ");\n");
-                if (i == machines) {
+                if (i == stockLimit) {
                     file.write("\n");
                 }
             }
 
 //            REPLENISHED
             for (int a = 0; a <= machines; a++) {
-                for (int y = 0; y <= machines; y++) {
+                for (int y = 0; y <= stockLimit; y++) {
                     file.write("\t[] s=" + states[2] + " & a=" + a + " & y=" + y + " -> ");
                     for (int k = 0; k <= machines; k++) {
                         if (XpaXu[a][k] != 0d) {
@@ -339,24 +346,29 @@ public class Model {
 
         double[] ps = new double[] {
                 0.5,
-                0.75
+                0.75,
+                0.8
         };
 
         for (double p : ps) {
-            Model model = new Model(
-                    50,
-                    p,
-                    0.5,
-                    1,
-                    10000,
-                    0.2
-            );
+            for (int i = 3; i <= 6; i++) {
+                Model model = new Model(
+                        50,
+                        p,
+                        0.5,
+                        1,
+                        10000,
+                        0.2
+                );
 
-            String filename = "model.nm";
+                model.limitStock(i);
 
-            model.toFile(filename);
+                String filename = "model.nm";
 
-            System.out.format("%.2f;%.2f\n", p, model.getResult(filename, 20));
+                model.toFile(filename);
+
+                System.out.format("%d;%.2f\n", i, model.getResult(filename, 20));
+            }
         }
 
 
