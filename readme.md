@@ -1,4 +1,6 @@
-# Generates prism models
+# Generates prism models for failure prediction
+
+For more information see: Dursun, Akcay, van Houtum: "How good must failure predictions be to make local spare parts stock superfluous?" https://doi.org/10.1016/j.ijpe.2023.109060
 
 Steps to create and verify for a set of parameters:
 
